@@ -31,3 +31,8 @@ cd android
 ./gradlew assembleDebug
 ```
 APK output: `android/app/build/outputs/apk/debug/app-debug.apk`
+
+
+## Android image saving fix
+
+The Save button now writes PNG images using the native Capacitor Filesystem plugin. Saved images are placed in the Android Documents/FixPaint folder. The GitHub Actions workflow bundles the local save module before syncing/building the Android app.
