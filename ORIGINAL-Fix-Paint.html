@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fix Paint</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&display=swap">
+<style>
+:root{--bg:#f1eefc;--panel:#ffffff;--ink:#1d1838;--mute:#7a7396;--line:#e2ddf5;--accent:#6d4aff;--soft:#ece7ff;--dot:#cfc8ee;--stage:#f8f7ff;--shadow:rgba(60,30,160,.14);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14111f;--panel:#211d33;--ink:#f1eeff;--mute:#9a93b8;--line:#342f4b;--accent:#9b85ff;--soft:#322b57;--dot:#3a3457;--stage:#1a1729;--shadow:rgba(0,0,0,.5)}}
+:root[data-theme="dark"]{--bg:#14111f;--panel:#211d33;--ink:#f1eeff;--mute:#9a93b8;--line:#342f4b;--accent:#9b85ff;--soft:#322b57;--dot:#3a3457;--stage:#1a1729;--shadow:rgba(0,0,0,.5)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:500 14px/1.3 Outfit,system-ui,-apple-system,"Segoe UI",sans-serif;overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none}
+#app{height:100%;max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:10px;padding:10px 12px 12px;box-sizing:border-box;position:relative}
+svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+header{display:flex;align-items:center;gap:6px;height:44px;flex:none}
+.brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:18px;flex:1;min-width:0}
+.logo{width:34px;height:34px;border-radius:11px;background:var(--accent);color:#fff;display:grid;place-items:center}
+.ib{width:40px;height:40px;border-radius:13px;background:var(--panel);display:grid;place-items:center;box-shadow:0 1px 3px var(--shadow)}
+.ib:disabled{opacity:.35;cursor:default}
+#stage{flex:1;min-height:0;position:relative;overflow:hidden;touch-action:none;border-radius:22px;border:1px solid var(--line);background:var(--stage) radial-gradient(var(--dot) 1px,transparent 1.2px) 0 0/18px 18px}
+#cv{position:absolute;left:0;top:0;transform-origin:0 0;box-shadow:0 4px 20px var(--shadow);background:#fff;max-width:none}
+#cv[hidden],#empty[hidden]{display:none}
+#empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:24px}
+#empty .logo{width:64px;height:64px;border-radius:22px}
+#empty .logo svg{width:30px;height:30px}
+#empty b{font-size:19px}#empty span{color:var(--mute);max-width:240px}
+.cta{margin-top:6px;background:var(--accent);color:#fff;border-radius:14px;padding:12px 22px;font-weight:600}
+#ring{position:absolute;pointer-events:none;border:1.5px solid #fff;border-radius:50%;mix-blend-mode:difference;display:none;transform:translate(-50%,-50%)}
+#dockwrap{position:relative;flex:none}
+#dock{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:6px;background:var(--panel);border-radius:22px;box-shadow:0 2px 10px var(--shadow)}
+.d{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;height:56px;border-radius:16px;color:var(--mute);font-size:12px;font-weight:600}
+.d.on{background:var(--soft);color:var(--accent)}
+.d .v{height:22px;display:grid;place-items:center;font-weight:700;font-size:13px}
+.dotc{width:20px;height:20px;border-radius:50%;border:2px solid var(--line)}
+.pop{display:none;position:absolute;left:0;right:0;bottom:calc(100% + 8px);background:var(--panel);border-radius:22px;padding:14px;box-shadow:0 8px 28px var(--shadow);border:1px solid var(--line);z-index:3;box-sizing:border-box}
+.pop.show{display:block}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.t{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;border-radius:14px;background:var(--bg);font-size:12px;font-weight:600}
+.t.on{background:var(--accent);color:#fff}
+.sws{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;justify-items:center}
+.sw{width:34px;height:34px;border-radius:50%;border:2px solid var(--line)}
+.sw.on{outline:3px solid var(--accent);outline-offset:2px}
+.cust{display:flex;align-items:center;justify-content:space-between;margin-top:14px;color:var(--mute);font-weight:600}
+input[type=color]{width:44px;height:32px;padding:0;border:1px solid var(--line);border-radius:10px;background:none}
+.sz{display:flex;align-items:center;gap:14px}
+#prevbox{width:56px;height:56px;border-radius:14px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;flex:none}
+#prev{border-radius:50%}
+.sb{width:36px;height:36px;border-radius:12px;background:var(--bg);font-weight:700;font-size:18px;flex:none}
+input[type=range]{flex:1;accent-color:var(--accent);min-width:0}
+.zm{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.zm button{flex:1;height:44px;border-radius:14px;background:var(--bg);font-weight:700;font-size:16px}
+#modal{position:fixed;inset:0;background:rgba(10,8,24,.85);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;z-index:9;box-sizing:border-box}
+.big{width:100%;max-width:360px;padding:16px;font-size:17px}.ghost{background:transparent;border:1px solid rgba(255,255,255,.5);margin-top:0}
+#modal img{-webkit-user-select:auto;user-select:auto;-webkit-touch-callout:default;max-width:100%;max-height:58%;background:#fff;object-fit:contain;border-radius:12px}
+#modal p{color:#fff;text-align:center;margin:0}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="brand"><span class="logo"><svg class="i" data-i="pen"></svg></span>Fix Paint</div>
+    <button class="ib" id="open" aria-label="Image kholo"><svg class="i" data-i="open"></svg></button>
+    <button class="ib" id="undo" aria-label="Undo" disabled><svg class="i" data-i="undo"></svg></button>
+    <button class="ib" id="redo" aria-label="Redo" disabled><svg class="i" data-i="redo"></svg></button>
+    <button class="ib" id="save" aria-label="Save" disabled><svg class="i" data-i="save"></svg></button>
+    <input type="file" id="file" accept="image/*" hidden>
+  </header>
+
+  <div id="stage">
+    <canvas id="cv" hidden></canvas>
+    <div id="ring"></div>
+    <div id="empty">
+      <span class="logo"><svg class="i" data-i="open"></svg></span>
+      <b>Image kholo</b>
+      <span>Text wali image chuno, galti mitao aur sahi likho</span>
+      <button class="cta" id="open2">Image chuno</button>
+    </div>
+  </div>
+
+  <div id="dockwrap">
+    <div class="pop" id="p-tool"><div class="grid4" id="tools"></div></div>
+    <div class="pop" id="p-color"><div class="sws" id="sws"></div>
+      <div class="cust"><span>Apna rang chuno</span><input type="color" id="cc" value="#e11d48" aria-label="Custom colour"></div></div>
+    <div class="pop" id="p-size"><div class="sz"><div id="prevbox"><div id="prev"></div></div><button class="sb" id="szm" aria-label="Size kam karo">−</button><input type="range" id="sz" min="1" max="200" value="8" aria-label="Size"><button class="sb" id="szp" aria-label="Size badhao">+</button></div></div>
+    <div class="pop" id="p-zoom"><div class="zm"><button id="zo" aria-label="Zoom out">−</button><button id="zl">100%</button><button id="zi" aria-label="Zoom in">+</button></div></div>
+    <nav id="dock">
+      <button class="d" data-p="tool"><span class="v"><svg class="i" id="dti" data-i="pen"></svg></span><span id="dtn">Pen</span></button>
+      <button class="d" data-p="color"><span class="v"><span class="dotc" id="dcol"></span></span>Rang</button>
+      <button class="d" data-p="size"><span class="v" id="dsz">8</span>Size</button>
+      <button class="d" data-p="zoom"><span class="v" id="dzl">100%</span>Zoom</button>
+    </nav>
+  </div>
+</div>
+
+<div id="modal"><img id="out" alt="Edited image"><p id="msg">Preview</p><button class="cta big" id="dl">Image save karo</button><button class="cta ghost" id="close">Band karo</button></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const IC={
+pen:'<path d="m4 20 1-4L16 5a2.1 2.1 0 0 1 3 3L8 19z"/>',
+erase:'<path d="m4 15 9-9 6 6-7 7H7z"/><path d="M10 20h9"/>',
+pick:'<path d="m14 7 3 3"/><path d="m16 3 5 5-3 1-3-3z"/><path d="M14 8 4 18v2h2l10-10"/>',
+hand:'<path d="M8 12V6a1.5 1.5 0 0 1 3 0v5M11 11V4.5a1.5 1.5 0 0 1 3 0V11M14 11V6a1.5 1.5 0 0 1 3 0v8a6 6 0 0 1-6 6h-1a6 6 0 0 1-5-3l-2-4a1.5 1.5 0 0 1 2.5-1.5L8 14"/>',
+open:'<path d="M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M12 11v5M9.5 13.5h5"/>',
+undo:'<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>',
+redo:'<path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/>',
+save:'<path d="M12 4v11"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/>'};
+const TN={pen:'Pen',erase:'Rubber',pick:'Rang lo',hand:'Hand'};
+const icon=n=>'<svg class="i" viewBox="0 0 24 24">'+IC[n]+'</svg>';
+document.querySelectorAll('svg[data-i]').forEach(s=>{s.setAttribute('viewBox','0 0 24 24');s.innerHTML=IC[s.dataset.i]});
+
+const stage=$('stage'),cv=$('cv'),ctx=cv.getContext('2d',{willReadFrequently:true}),ring=$('ring');
+let S=1,TX=0,TY=0,tool='pen',color='#e11d48',size=8,hist=[],redo=[],has=false,pop=null;
+let ptrs=new Map(),drawing=false,pan=false,last=null,g=null;
+
+function updSize(){const d=Math.max(3,Math.min(48,size*S));$('prev').style.cssText='width:'+d+'px;height:'+d+'px;background:'+(tool==='erase'?'#cfcfcf':color);$('dsz').textContent=size}
+function apply(){cv.style.transform='translate('+TX+'px,'+TY+'px) scale('+S+')';cv.style.imageRendering=S>3?'pixelated':'auto';const z=Math.round(S*100)+'%';$('zl').textContent=z;$('dzl').textContent=z;updSize()}
+function fit(){const r=stage.getBoundingClientRect();S=Math.min(r.width/cv.width,r.height/cv.height)*.94;TX=(r.width-cv.width*S)/2;TY=(r.height-cv.height*S)/2;apply()}
+function zoomAt(cx,cy,k){const n=Math.max(.05,Math.min(40,S*k));const px=(cx-TX)/S,py=(cy-TY)/S;S=n;TX=cx-px*S;TY=cy-py*S;apply()}
+function upd(){$('undo').disabled=!hist.length;$('redo').disabled=!redo.length;$('save').disabled=!has}
+function snap(){hist.push(ctx.getImageData(0,0,cv.width,cv.height));if(hist.length>25)hist.shift();redo=[];upd()}
+function load(src){const im=new Image();im.onload=()=>{const k=Math.min(1,4096/Math.max(im.naturalWidth,im.naturalHeight));
+cv.width=Math.round(im.naturalWidth*k);cv.height=Math.round(im.naturalHeight*k);
+cv.style.width=cv.width+'px';cv.style.height=cv.height+'px';
+ctx.fillStyle='#fff';ctx.fillRect(0,0,cv.width,cv.height);ctx.drawImage(im,0,0,cv.width,cv.height);
+hist=[];redo=[];has=true;$('empty').hidden=true;cv.hidden=false;
+setSize(Math.max(2,Math.round(Math.max(cv.width,cv.height)/150)));fit();upd()};im.src=src}
+function readFile(f){if(!f||!f.type.startsWith('image/'))return;const r=new FileReader();r.onload=()=>load(r.result);r.readAsDataURL(f)}
+function setSize(v){size=+v;$('sz').value=size;updSize()}
+function setColor(c){color=c;$('cc').value=c;$('dcol').style.background=c;document.querySelectorAll('.sw').forEach(s=>s.classList.toggle('on',s.dataset.c===c));updSize()}
+function setTool(t){tool=t;$('dti').innerHTML=IC[t];$('dtn').textContent=TN[t];document.querySelectorAll('#tools .t').forEach(b=>b.classList.toggle('on',b.dataset.t===t));ring.style.display='none';updSize()}
+function openPop(n){pop=(pop===n)?null:n;['tool','color','size','zoom'].forEach(k=>{$('p-'+k).classList.toggle('show',pop===k)});document.querySelectorAll('.d').forEach(b=>b.classList.toggle('on',b.dataset.p===pop))}
+
+Object.keys(TN).forEach(t=>{const b=document.createElement('button');b.className='t';b.dataset.t=t;b.innerHTML=icon(t)+TN[t];b.onclick=()=>{setTool(t);openPop(null)};$('tools').append(b)});
+['#000000','#ffffff','#e11d48','#f97316','#eab308','#16a34a','#0ea5e9','#2563eb','#7c3aed','#db2777','#78350f','#6b7280'].forEach(c=>{
+const b=document.createElement('button');b.className='sw';b.style.background=c;b.dataset.c=c;b.setAttribute('aria-label','Rang '+c);
+b.onclick=()=>{setColor(c);if(tool!=='pen')setTool('pen')};$('sws').append(b)});
+setColor(color);setTool('pen');
+
+document.querySelectorAll('.d').forEach(b=>b.onclick=()=>openPop(b.dataset.p));
+document.addEventListener('pointerdown',e=>{if(pop&&!e.target.closest('#dockwrap')){openPop(null);e.stopPropagation();e.preventDefault()}},true);
+$('open').onclick=$('open2').onclick=()=>$('file').click();
+$('file').onchange=e=>{readFile(e.target.files[0]);e.target.value=''};
+document.addEventListener('paste',e=>{const it=[...(e.clipboardData?.items||[])].find(i=>i.type.startsWith('image/'));if(it)readFile(it.getAsFile())});
+$('undo').onclick=()=>{if(!hist.length)return;redo.push(ctx.getImageData(0,0,cv.width,cv.height));ctx.putImageData(hist.pop(),0,0);upd()};
+$('redo').onclick=()=>{if(!redo.length)return;hist.push(ctx.getImageData(0,0,cv.width,cv.height));ctx.putImageData(redo.pop(),0,0);upd()};
+$('cc').oninput=e=>{setColor(e.target.value);if(tool!=='pen')setTool('pen')};
+$('sz').oninput=e=>setSize(e.target.value);
+$('szm').onclick=()=>setSize(Math.max(1,size-1));$('szp').onclick=()=>setSize(Math.min(200,size+1));
+const sc=()=>{const r=stage.getBoundingClientRect();return[r.width/2,r.height/2]};
+$('zi').onclick=()=>has&&zoomAt(...sc(),1.25);$('zo').onclick=()=>has&&zoomAt(...sc(),.8);$('zl').onclick=()=>has&&fit();
+$('save').onclick=()=>{$('out').src=cv.toDataURL('image/png');$('msg').textContent='Preview taiyaar hai';$('modal').style.display='flex'};
+$('dl').onclick=async()=>{const m=t=>$('msg').textContent=t,log=[];m('Save ho raha hai...');
+const blob=await new Promise(r=>cv.toBlob(r,'image/png'));const file=new File([blob],'fix-paint.png',{type:'image/png'});
+try{const d=window.claude?await window.claude.use('downloads'):null;if(d){await d.save({filename:'fix-paint.png',data:blob});m('Image save ho gayi');return}log.push('downloads: null')}catch(e){if(e&&e.code==='declined'){m('Save cancel ho gaya');return}log.push('downloads: '+((e&&e.code)||e))}
+try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'Fix Paint'});m('Share menu se Save Image ya Files chuno');return}log.push('share: no')}catch(e){if(e&&e.name==='AbortError'){m('Cancel ho gaya');return}log.push('share: '+((e&&e.name)||e))}
+try{if(navigator.clipboard&&window.ClipboardItem){await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);m('Image copy ho gayi. Gallery, WhatsApp ya Notes mein paste karke save karo');return}log.push('clipboard: no')}catch(e){log.push('clipboard: '+((e&&e.name)||e))}
+m('Save nahi ho paya. '+log.join(' | '))};
+$('close').onclick=()=>$('modal').style.display='none';
+
+function pt(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)*cv.width/r.width,y:(e.clientY-r.top)*cv.height/r.height}}
+function style(){ctx.lineCap=ctx.lineJoin='round';ctx.lineWidth=size;ctx.strokeStyle=ctx.fillStyle=tool==='erase'?'#ffffff':color}
+function dot(p){style();ctx.beginPath();ctx.arc(p.x,p.y,size/2,0,7);ctx.fill()}
+function seg(a,b){style();ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()}
+const hex=n=>n.toString(16).padStart(2,'0');
+function pick(e){const p=pt(e);if(p.x<0||p.y<0||p.x>=cv.width||p.y>=cv.height)return;const d=ctx.getImageData(p.x|0,p.y|0,1,1).data;setColor('#'+hex(d[0])+hex(d[1])+hex(d[2]));setTool('pen')}
+function startG(){const [a,b]=[...ptrs.values()],r=stage.getBoundingClientRect();
+const cx=(a.x+b.x)/2-r.left,cy=(a.y+b.y)/2-r.top;g={d:Math.hypot(a.x-b.x,a.y-b.y)||1,S,px:(cx-TX)/S,py:(cy-TY)/S}}
+
+stage.addEventListener('pointerdown',e=>{
+if(!has)return;stage.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+if(ptrs.size===2){if(drawing){ctx.putImageData(hist.pop(),0,0);drawing=false;upd()}pan=false;startG();return}
+if(ptrs.size>2)return;
+if(tool==='hand'){pan=true;last={x:e.clientX,y:e.clientY};return}
+if(tool==='pick'){pick(e);return}
+snap();drawing=true;last=pt(e);dot(last)});
+stage.addEventListener('pointermove',e=>{
+if(has&&e.pointerType==='mouse'&&(tool==='pen'||tool==='erase')){const r=stage.getBoundingClientRect(),d=Math.max(4,size*S);
+ring.style.cssText='display:block;width:'+d+'px;height:'+d+'px;left:'+(e.clientX-r.left)+'px;top:'+(e.clientY-r.top)+'px'}
+if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+if(ptrs.size===2&&g){const [a,b]=[...ptrs.values()],r=stage.getBoundingClientRect();
+const cx=(a.x+b.x)/2-r.left,cy=(a.y+b.y)/2-r.top;S=Math.max(.05,Math.min(40,g.S*Math.hypot(a.x-b.x,a.y-b.y)/g.d));
+TX=cx-g.px*S;TY=cy-g.py*S;apply();return}
+if(pan){TX+=e.clientX-last.x;TY+=e.clientY-last.y;last={x:e.clientX,y:e.clientY};apply();return}
+if(drawing){const p=pt(e);seg(last,p);last=p}});
+function end(e){ptrs.delete(e.pointerId);if(ptrs.size<2)g=null;if(!ptrs.size){drawing=false;pan=false}}
+stage.addEventListener('pointerup',end);stage.addEventListener('pointercancel',end);
+stage.addEventListener('pointerleave',()=>{ring.style.display='none'});
+stage.addEventListener('wheel',e=>{if(!has)return;e.preventDefault();const r=stage.getBoundingClientRect();zoomAt(e.clientX-r.left,e.clientY-r.top,e.deltaY<0?1.12:1/1.12)},{passive:false});
+window.addEventListener('resize',()=>has&&apply());
+</script>
+</body>
+</html>
