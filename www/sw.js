@@ -1,7 +1,8 @@
-const CACHE = "fix-paint-offline-v1";
+const CACHE = "fix-paint-offline-v2";
 const APP_FILES = [
   "./",
   "./index.html",
+  "./native-save.bundle.js",
   "./manifest.webmanifest",
   "./icons/icon.svg"
 ];

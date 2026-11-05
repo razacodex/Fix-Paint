@@ -159,7 +159,9 @@ const sc=()=>{const r=stage.getBoundingClientRect();return[r.width/2,r.height/2]
 $('zi').onclick=()=>has&&zoomAt(...sc(),1.25);$('zo').onclick=()=>has&&zoomAt(...sc(),.8);$('zl').onclick=()=>has&&fit();
 $('save').onclick=()=>{$('out').src=cv.toDataURL('image/png');$('msg').textContent='Preview taiyaar hai';$('modal').style.display='flex'};
 $('dl').onclick=async()=>{const m=t=>$('msg').textContent=t,log=[];m('Save ho raha hai...');
-const blob=await new Promise(r=>cv.toBlob(r,'image/png'));const file=new File([blob],'fix-paint.png',{type:'image/png'});
+const blob=await new Promise(r=>cv.toBlob(r,'image/png'));if(!blob){m('Image taiyaar nahi ho payi');return;}
+if(window.fixPaintNativeSave){try{const result=await window.fixPaintNativeSave(blob);m('Image save ho gayi: Documents/FixPaint');return;}catch(e){m('Native save error: '+(e?.message||e));return;}}
+const file=new File([blob],'fix-paint.png',{type:'image/png'});
 try{const d=window.claude?await window.claude.use('downloads'):null;if(d){await d.save({filename:'fix-paint.png',data:blob});m('Image save ho gayi');return}log.push('downloads: null')}catch(e){if(e&&e.code==='declined'){m('Save cancel ho gaya');return}log.push('downloads: '+((e&&e.code)||e))}
 try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'Fix Paint'});m('Share menu se Save Image ya Files chuno');return}log.push('share: no')}catch(e){if(e&&e.name==='AbortError'){m('Cancel ho gaya');return}log.push('share: '+((e&&e.name)||e))}
 try{if(navigator.clipboard&&window.ClipboardItem){await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);m('Image copy ho gayi. Gallery, WhatsApp ya Notes mein paste karke save karo');return}log.push('clipboard: no')}catch(e){log.push('clipboard: '+((e&&e.name)||e))}
@@ -202,5 +204,6 @@ window.addEventListener('resize',()=>has&&apply());
    window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
  }
  </script>
+ <script type="module" src="./native-save.bundle.js"></script>
 </body>
 </html>
