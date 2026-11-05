@@ -1,0 +1,20 @@
+{
+  "id": "./",
+  "name": "Fix Paint",
+  "short_name": "Fix Paint",
+  "description": "Offline image touch-up and paint tool",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f1eefc",
+  "theme_color": "#6d4aff",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
