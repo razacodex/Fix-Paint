@@ -1,0 +1,6 @@
+{
+  "appId": "com.fixpaint.app",
+  "appName": "Fix Paint",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
