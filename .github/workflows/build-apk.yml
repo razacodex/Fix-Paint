@@ -31,6 +31,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Build web bundle
+        run: npm run build:web
+
       - name: Create Android project and sync app
         run: |
           npx cap add android
